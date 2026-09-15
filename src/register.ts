@@ -56,7 +56,7 @@ const body: Command[] = [
       { name: 'catalog', description: 'List every snack in the catalog', type: SUBCOMMAND },
       {
         name: 'forget',
-        description: 'Snack buyer: remove a product from the catalog',
+        description: 'Remove a product from the catalog',
         type: SUBCOMMAND,
         options: [
           { name: 'item', description: 'Part of the product’s name', type: STRING, required: true },
