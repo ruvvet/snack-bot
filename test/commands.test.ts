@@ -474,3 +474,74 @@ test('/snack catalog says so when nothing has been added yet', async () => {
   const embed = 'embeds' in reply ? reply.embeds[0]! : undefined;
   assert.match(embed!.description!, /Nothing in the catalog yet/);
 });
+
+/** A D1 stand-in whose search actually filters by title, and that records deletes. */
+function forgetDb(rows: { asin: string; title: string }[]) {
+  const deleted: string[] = [];
+  const stmt = {
+    args: [] as unknown[],
+    bind(...a: unknown[]) {
+      stmt.args = a;
+      return stmt;
+    },
+    async run() {
+      deleted.push(stmt.args[0] as string);
+      return {};
+    },
+    async all<T>() {
+      const patterns = stmt.args
+        .filter((a): a is string => typeof a === 'string')
+        .map((p) => p.replace(/%/g, '').toLowerCase());
+      return {
+        results: rows
+          .filter((r) => patterns.every((p) => r.title.toLowerCase().includes(p)))
+          .map((r) => ({ ...r, price_cents: 100, pack_size: null, image_url: '' })) as T[],
+      };
+    },
+    async first<T>() {
+      return { n: rows.length } as T;
+    },
+  };
+  return { deleted, prepare: () => stmt };
+}
+
+test('/snack forget removes the one matching product, buyer only', async () => {
+  const { forgetCommand } = await import('../src/commands/catalog.ts');
+  const { config } = await import('../src/config.ts');
+
+  config.buyerRoleId = 'role-1';
+  try {
+    const db = forgetDb([{ asin: 'B1', title: 'Oreos' }]);
+
+    // Not the buyer: refused, nothing deleted.
+    const refused = await forgetCommand(db as never)({ ...inv(), options: { item: 'oreos' } });
+    assert.match('text' in refused ? refused.text! : '', /role-1/);
+    assert.equal(db.deleted.length, 0);
+
+    // The buyer: deleted, and told so.
+    const ok = await forgetCommand(db as never)({
+      ...inv('u1', ['role-1']),
+      options: { item: 'oreos' },
+    });
+    assert.match('text' in ok ? ok.text! : '', /Forgot \*\*Oreos\*\*/);
+    assert.deepEqual(db.deleted, ['B1']);
+  } finally {
+    config.buyerRoleId = '';
+  }
+});
+
+test('/snack forget asks for specifics on an ambiguous match, and says so on none', async () => {
+  const { forgetCommand } = await import('../src/commands/catalog.ts');
+  const db = forgetDb([
+    { asin: 'B1', title: 'Chocolate Chip Cookies' },
+    { asin: 'B2', title: 'Oatmeal Cookies' },
+  ]);
+
+  const ambiguous = await forgetCommand(db as never)({ ...inv(), options: { item: 'cookies' } });
+  assert.match('text' in ambiguous ? ambiguous.text! : '', /matches 2 products/);
+
+  const none = await forgetCommand(db as never)({ ...inv(), options: { item: 'pretzels' } });
+  assert.match('text' in none ? none.text! : '', /Nothing in the catalog matches/);
+
+  assert.equal(db.deleted.length, 0);
+});
