@@ -20,6 +20,7 @@ export function helpCommand(db: D1Like): Handler {
             '**Adding**',
             '`/snack add <amazon link>` — the surest way. The link is looked up and remembered.',
             '`/snack add <keyword>` — searches snacks people have already added.',
+            '`/snack catalog` — list every snack ever added, alphabetically.',
             'Right-click any message → Apps → **Add as snack** — turns "we\'re out of oreos" into a suggestion.',
             'Anything Amazon files under a non-food department is refused; the Official Snack Buyer can override it with **Add anyway**.',
             '',

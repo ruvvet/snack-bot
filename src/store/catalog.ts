@@ -109,6 +109,15 @@ export async function searchPhrase(db: D1Like, phrase: string, limit = 5): Promi
   return [];
 }
 
+/** Every product known, alphabetical. Capped so a growing catalog can't blow past Discord's embed limit in one query. */
+export async function listProducts(db: D1Like, limit = 200): Promise<Product[]> {
+  const { results } = await db
+    .prepare('SELECT * FROM products ORDER BY title COLLATE NOCASE LIMIT ?')
+    .bind(limit)
+    .all<Row>();
+  return results.map(toProduct);
+}
+
 export async function catalogSize(db: D1Like): Promise<number> {
   const row = await db.prepare('SELECT COUNT(*) AS n FROM products').bind().first<{ n: number }>();
   return row?.n ?? 0;

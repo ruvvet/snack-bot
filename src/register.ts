@@ -53,6 +53,7 @@ const body: Command[] = [
         ],
       },
       { name: 'list', description: 'Show the current list and the budget line', type: SUBCOMMAND },
+      { name: 'catalog', description: 'List every snack in the catalog', type: SUBCOMMAND },
       {
         name: 'flag',
         description: 'Add an allergen warning to an item on the current list',
