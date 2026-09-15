@@ -4,7 +4,7 @@ import { rest } from './platform/http/rest.ts';
 import { createRouter } from './platform/http/router.ts';
 import { addCommand, pickHandler, forceAddHandler } from './commands/add.ts';
 import { listCommand } from './commands/list.ts';
-import { catalogCommand } from './commands/catalog.ts';
+import { catalogCommand, forgetCommand } from './commands/catalog.ts';
 import {
   digestCommand,
   runDigest,
@@ -48,6 +48,7 @@ export default {
       .command('add', addCommand(store, api, env.DB), true)
       .command('list', listCommand(store, env.DB))
       .command('catalog', catalogCommand(env.DB))
+      .command('forget', forgetCommand(env.DB))
       .command('digest', digestCommand(store, api, env.DB))
       .command('unavailable', unavailableCommand(store, api))
       .command('substitute', substituteCommand(store, api, env.DB), true)

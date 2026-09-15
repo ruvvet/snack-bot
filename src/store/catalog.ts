@@ -118,6 +118,15 @@ export async function listProducts(db: D1Like, limit = 200): Promise<Product[]> 
   return results.map(toProduct);
 }
 
+/**
+ * Drop a product from the catalog. Items already on a week's list are
+ * unaffected — `added` events carry their own title, price, and image rather
+ * than pointing back here — so this only stops future keyword search hits.
+ */
+export async function deleteProduct(db: D1Like, asin: string): Promise<void> {
+  await db.prepare('DELETE FROM products WHERE asin = ?').bind(asin).run();
+}
+
 export async function catalogSize(db: D1Like): Promise<number> {
   const row = await db.prepare('SELECT COUNT(*) AS n FROM products').bind().first<{ n: number }>();
   return row?.n ?? 0;

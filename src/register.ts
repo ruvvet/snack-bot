@@ -55,6 +55,14 @@ const body: Command[] = [
       { name: 'list', description: 'Show the current list and the budget line', type: SUBCOMMAND },
       { name: 'catalog', description: 'List every snack in the catalog', type: SUBCOMMAND },
       {
+        name: 'forget',
+        description: 'Remove a product from the catalog',
+        type: SUBCOMMAND,
+        options: [
+          { name: 'item', description: 'Part of the product’s name', type: STRING, required: true },
+        ],
+      },
+      {
         name: 'flag',
         description: 'Add an allergen warning to an item on the current list',
         type: SUBCOMMAND,
