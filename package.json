@@ -10,7 +10,9 @@
     "migrate:local": "wrangler d1 migrations apply snack-bot --local",
     "migrate": "wrangler d1 migrations apply snack-bot --remote",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --experimental-strip-types test/*.test.ts"
+    "test": "node --test --experimental-strip-types test/*.test.ts",
+    "seed": "tsx scripts/seed.ts",
+    "seed:local": "tsx scripts/seed.ts --local"
   },
   "dependencies": {
     "dotenv": "^16.4.7"

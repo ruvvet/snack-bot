@@ -24,6 +24,7 @@ const DIGEST_HOUR = 9;
 const MONDAY = 1;
 import { voteHandler, removeHandler } from './commands/vote.ts';
 import { unavailableCommand, substituteCommand } from './commands/outcome.ts';
+import { simulateCommand } from './commands/simulate.ts';
 import { repeatCommand } from './commands/repeat.ts';
 import { flagCommand } from './commands/flag.ts';
 import { suggestCommand } from './commands/suggest.ts';
@@ -52,6 +53,7 @@ export default {
       .command('digest', digestCommand(store, api, env.DB))
       .command('unavailable', unavailableCommand(store, api))
       .command('substitute', substituteCommand(store, api, env.DB), true)
+      .command('simulate', simulateCommand(store, api, env.DB), true)
       .command('repeat', repeatCommand(store))
       .command('flag', flagCommand(store, api))
       .command('rate', rateCommand(store, env.DB))

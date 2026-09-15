@@ -1,0 +1,559 @@
+<title>Snack Bot Demo Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  /* A deck is projected, and a presenter should know exactly what it looks
+     like before they stand up — so this commits to one dark palette rather
+     than following the viewer's theme. Every colour is painted explicitly. */
+  :root {
+    --ground: #0c1013;
+    --surface: #161c22;
+    --ink: #f1f4f7;
+    --soft: #9aa7b4;
+    --faint: #6b7884;
+    --rule: #242d36;
+    --accent: #5fe0bd;
+    --signal: #f29a63;
+
+    --display: "Bricolage Grotesque", "Helvetica Neue", sans-serif;
+    --body: "Newsreader", Georgia, serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- deck chrome ---------- */
+  #bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--accent);
+    width: 0;
+    transition: width 0.25s ease;
+    z-index: 10;
+  }
+
+  #nav {
+    position: fixed;
+    right: 16px; bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 10;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--faint);
+  }
+  #nav button {
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1;
+    color: var(--soft);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+  }
+  #nav button:hover { color: var(--ink); border-color: var(--soft); }
+  #nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #count { font-variant-numeric: tabular-nums; min-width: 3.5rem; text-align: right; }
+
+  /* ---------- slides ---------- */
+  .slide {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 16px;
+    padding-block: clamp(3rem, 8vh, 6rem);
+    max-width: 62rem;
+    margin: 0 auto;
+    overflow-y: auto;
+  }
+  .slide.wide { max-width: 76rem; }
+
+  .kicker {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(0.625rem, 1.4vw, 0.75rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 9vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(1.75rem, 5vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: clamp(1.0625rem, 2.4vw, 1.6rem);
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--soft);
+    max-width: 40ch;
+    margin: 0;
+  }
+  .lede strong { color: var(--ink); font-weight: 400; }
+  .lede em { color: var(--accent); font-style: normal; }
+
+  .note {
+    font-size: clamp(0.875rem, 1.6vw, 1rem);
+    color: var(--faint);
+    max-width: 52ch;
+    margin: 0;
+  }
+
+  /* three-up mechanics / stack rows */
+  .rows { display: flex; flex-direction: column; gap: 0; }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(8rem, 14rem) 1fr;
+    gap: 0.35rem 2rem;
+    padding: clamp(0.85rem, 2vh, 1.25rem) 0;
+    border-top: 1px solid var(--rule);
+  }
+  .row:last-child { border-bottom: 1px solid var(--rule); }
+  .row dt {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(1rem, 2vw, 1.375rem);
+    color: var(--ink);
+  }
+  .row dd {
+    margin: 0;
+    font-size: clamp(0.9375rem, 1.8vw, 1.125rem);
+    color: var(--soft);
+    line-height: 1.45;
+  }
+  .row dd em { color: var(--accent); font-style: normal; }
+  .row .aws { font-family: var(--mono); font-size: 0.8em; color: var(--faint); }
+
+  /* closed-doors list */
+  .doors { display: flex; flex-direction: column; gap: 0.1rem; margin: 0; padding: 0; list-style: none; }
+  .doors li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: clamp(0.5rem, 1.4vh, 0.8rem) 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: clamp(0.9375rem, 1.9vw, 1.1875rem);
+  }
+  .doors .what { font-family: var(--display); font-weight: 500; }
+  .doors .verdict { font-family: var(--mono); font-size: 0.78em; color: var(--faint); text-align: right; }
+
+  /* facts */
+  .facts { display: flex; flex-wrap: wrap; gap: 1rem 2.5rem; margin: 0; padding: 0; }
+  .facts div { display: flex; flex-direction: column; }
+  .facts dt {
+    font-family: var(--display);
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .facts dd {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-variant-numeric: tabular-nums;
+    margin: 0.15rem 0 0;
+    color: var(--ink);
+  }
+
+  /* demo checklist */
+  .beats { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.9rem 2rem; margin: 0; padding: 0; list-style: none; }
+  .beats li { display: grid; grid-template-columns: 1.75rem 1fr; gap: 0.75rem; align-items: baseline; font-size: clamp(0.9375rem, 1.8vw, 1.0625rem); color: var(--soft); }
+  .beats .n { font-family: var(--mono); font-size: 0.8em; color: var(--accent); }
+  .beats b { font-family: var(--display); font-weight: 500; color: var(--ink); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    color: var(--accent);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0.06em 0.34em;
+  }
+
+  .pull {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: clamp(1.25rem, 3.4vw, 2.25rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    border-left: 3px solid var(--accent);
+    padding-left: clamp(0.9rem, 2vw, 1.5rem);
+    margin: 0;
+    max-width: 34ch;
+    text-wrap: balance;
+  }
+
+  /* ---------- diagrams ---------- */
+  figure { margin: 0; }
+  svg { width: 100%; max-width: 100%; height: auto; display: block; }
+  figcaption { font-size: clamp(0.8125rem, 1.5vw, 0.9375rem); color: var(--faint); margin-top: 0.9rem; max-width: 56ch; }
+
+  .box { fill: var(--surface); stroke: var(--rule); stroke-width: 1.5; }
+  .box-main { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
+  .lab { font-family: var(--display); font-weight: 500; font-size: 14px; fill: var(--ink); }
+  .sub { font-family: var(--body); font-size: 11px; fill: var(--faint); }
+  .code-t { font-family: var(--mono); font-size: 11px; fill: var(--soft); }
+  .edge { stroke: var(--soft); stroke-width: 1.5; fill: none; }
+  .edge-hot { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+  .edge-roll { stroke: var(--signal); stroke-width: 1.75; fill: none; stroke-dasharray: 5 4; }
+  .elab { font-family: var(--display); font-size: 11px; font-weight: 500; fill: var(--soft); }
+  .elab-hot { font-family: var(--display); font-size: 11.5px; font-weight: 800; fill: var(--accent); }
+  .elab-roll { font-family: var(--display); font-size: 11px; font-weight: 500; fill: var(--signal); }
+  .dot { fill: var(--ink); }
+  .dot-hot { fill: var(--signal); }
+  .when { font-family: var(--display); font-size: 10.5px; font-weight: 800; letter-spacing: 0.1em; fill: var(--faint); }
+  .what-t { font-family: var(--display); font-size: 13px; font-weight: 500; fill: var(--ink); }
+  .what-hot { font-family: var(--display); font-size: 13px; font-weight: 800; fill: var(--signal); }
+
+  .hint {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--faint);
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #bar { transition: none; }
+  }
+</style>
+
+<div id="bar"></div>
+
+<!-- 1 -->
+<section class="slide" id="s1">
+  <p class="kicker">Jewelers Mutual · Raleigh · Hackathon</p>
+  <h1>Snack&nbsp;Bot</h1>
+  <p class="lede">please give us snacks in raleigh</p>
+  <p class="note">An office snack bot that can&rsquo;t buy anything — and why that turned out to be the whole idea.</p>
+  <p class="hint">→ / space to advance · ← to go back</p>
+</section>
+
+<!-- 2 -->
+<section class="slide" id="s2">
+  <p class="kicker">The ask</p>
+  <h2>We want snacks. Let us make it easy and democratic.</h2>
+  <p class="lede">Somebody has to buy them — and somebody has to decide <strong>which</strong>. That second part is where the office actually argues, and it&rsquo;s the part no shared spreadsheet solves.</p>
+  <p class="note">Wants always exceed the budget. A list tells you what people want; it doesn&rsquo;t tell you what to buy.</p>
+</section>
+
+<!-- 3 -->
+<section class="slide" id="s3">
+  <p class="kicker">What it actually is</p>
+  <h2>Not a shopping list. An allocation system.</h2>
+  <dl class="rows">
+    <div class="row">
+      <dt>Budget cut line</dt>
+      <dd>Sorted by votes, filled to the cap. An item that doesn&rsquo;t fit is <em>skipped, not terminal</em> — a cheap popular snack still gets in behind an expensive one.</dd>
+    </div>
+    <div class="row">
+      <dt>Rollover queue</dt>
+      <dd>Everything below the line moves to next week <em>with its votes</em>. Popular things that just missed win the next round.</dd>
+    </div>
+    <div class="row">
+      <dt>Past verdicts</dt>
+      <dd>A snack nobody ate carries a penalty forward, bounded at <em>+1 / −2</em> so this week&rsquo;s vote still outweighs history.</dd>
+    </div>
+  </dl>
+</section>
+
+<!-- 4 -->
+<section class="slide wide" id="s4">
+  <p class="kicker">How a week moves</p>
+  <figure>
+    <svg viewBox="0 0 860 150" role="img" aria-label="A week runs from requests and votes, to Monday's budget cut line, to escalating reminders, to a person buying it, to private verdicts the following week. Items below the budget line roll into next week with their votes.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--signal)"/>
+        </marker>
+      </defs>
+      <line class="edge" x1="86" y1="56" x2="774" y2="56"/>
+
+      <circle class="dot" cx="86" cy="56" r="5"/>
+      <text class="when" x="86" y="34" text-anchor="middle">ALL WEEK</text>
+      <text class="what-t" x="86" y="80" text-anchor="middle">Requests &amp; votes</text>
+
+      <circle class="dot" cx="258" cy="56" r="5"/>
+      <text class="when" x="258" y="34" text-anchor="middle">MON 9:00</text>
+      <text class="what-t" x="258" y="80" text-anchor="middle">Budget cut line</text>
+
+      <circle class="dot" cx="430" cy="56" r="5"/>
+      <text class="when" x="430" y="34" text-anchor="middle">MON–WED</text>
+      <text class="what-t" x="430" y="80" text-anchor="middle">Reminders escalate</text>
+
+      <circle class="dot-hot" cx="602" cy="56" r="6.5"/>
+      <text class="when" x="602" y="34" text-anchor="middle">WHENEVER</text>
+      <text class="what-hot" x="602" y="80" text-anchor="middle">A person buys it</text>
+
+      <circle class="dot" cx="774" cy="56" r="5"/>
+      <text class="when" x="774" y="34" text-anchor="middle">NEXT WEEK</text>
+      <text class="what-t" x="774" y="80" text-anchor="middle">Verdicts, private</text>
+
+      <path class="edge-roll" d="M258,92 C258,124 172,124 92,100" marker-end="url(#ar)"/>
+      <text class="elab-roll" x="180" y="140" text-anchor="middle">everything below the line rolls forward, votes intact</text>
+    </svg>
+    <figcaption>One reminder Monday afternoon, two Tuesday, three Wednesday — then it stops. Rollover means exactly one thing: the budget squeezed it out.</figcaption>
+  </figure>
+</section>
+
+<!-- 5 -->
+<section class="slide" id="s5">
+  <p class="kicker">The stack</p>
+  <h2>Everything on a free tier</h2>
+  <dl class="facts">
+    <div><dt>Cost to run</dt><dd>$0</dd></div>
+    <div><dt>Runtime deps</dt><dd>1</dd></div>
+    <div><dt>Commands</dt><dd>11</dd></div>
+    <div><dt>Tests</dt><dd>76</dd></div>
+  </dl>
+  <dl class="rows">
+    <div class="row">
+      <dt>Cloudflare Workers</dt>
+      <dd>The bot itself. Nothing idles — it survives the laptop closing. <span class="aws">≈ Lambda + API Gateway</span></dd>
+    </div>
+    <div class="row">
+      <dt>Cloudflare D1</dt>
+      <dd>SQLite at the edge, holding an <em>append-only event log</em>. No UPDATE, no DELETE, anywhere. <span class="aws">≈ Aurora Serverless</span></dd>
+    </div>
+    <div class="row">
+      <dt>Cron Triggers</dt>
+      <dd>One hourly firing; the schedule lives in tested code, not in five cron expressions. <span class="aws">≈ EventBridge Scheduler</span></dd>
+    </div>
+    <div class="row">
+      <dt>Ed25519 · WebCrypto</dt>
+      <dd>Every interaction is signature-verified and <em>fails closed</em>. An unverified endpoint is an open write path into the database.</dd>
+    </div>
+  </dl>
+</section>
+
+<!-- 6 -->
+<section class="slide wide" id="s6">
+  <p class="kicker">How a request moves</p>
+  <figure>
+    <svg viewBox="0 0 860 330" role="img" aria-label="Discord posts a signed interaction to one Cloudflare Worker, which reads and appends to D1, fetches product pages from amazon.com, and replies to Discord. An hourly cron trigger invokes the same Worker.">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--soft)"/>
+        </marker>
+        <marker id="arr-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
+
+      <rect class="box" x="16" y="110" width="140" height="80" rx="3"/>
+      <text class="lab" x="86" y="145" text-anchor="middle">Discord</text>
+      <text class="sub" x="86" y="163" text-anchor="middle">one app, 11 commands</text>
+
+      <rect class="box-main" x="340" y="78" width="190" height="144" rx="3"/>
+      <text class="lab" x="435" y="135" text-anchor="middle">Cloudflare Worker</text>
+      <text class="code-t" x="435" y="155" text-anchor="middle">fetch() · scheduled()</text>
+      <text class="sub" x="435" y="173" text-anchor="middle">one script, two entry points</text>
+
+      <rect class="box" x="680" y="80" width="164" height="60" rx="3"/>
+      <text class="lab" x="762" y="105" text-anchor="middle">Cloudflare D1</text>
+      <text class="sub" x="762" y="123" text-anchor="middle">events · catalog · scores</text>
+
+      <rect class="box" x="680" y="160" width="164" height="60" rx="3"/>
+      <text class="lab" x="762" y="185" text-anchor="middle">amazon.com</text>
+      <text class="sub" x="762" y="203" text-anchor="middle">title · price · department</text>
+
+      <rect class="box" x="340" y="262" width="190" height="52" rx="3"/>
+      <text class="lab" x="435" y="284" text-anchor="middle">Cron trigger</text>
+      <text class="code-t" x="435" y="301" text-anchor="middle">0 * * * *</text>
+
+      <line class="edge-hot" x1="156" y1="134" x2="334" y2="134" marker-end="url(#arr-hot)"/>
+      <text class="elab-hot" x="245" y="126" text-anchor="middle">POST signed interaction</text>
+
+      <line class="edge" x1="334" y1="166" x2="162" y2="166" marker-end="url(#arr)"/>
+      <line class="edge" x1="530" y1="110" x2="674" y2="110" marker-end="url(#arr)"/>
+      <line class="edge" x1="530" y1="190" x2="674" y2="190" marker-end="url(#arr)"/>
+      <line class="edge" x1="435" y1="262" x2="435" y2="228" marker-end="url(#arr)"/>
+      <text class="elab" x="245" y="182" text-anchor="middle">reply · REST post</text>
+      <text class="elab" x="602" y="102" text-anchor="middle">read · append</text>
+      <text class="elab" x="602" y="182" text-anchor="middle">fetch on paste</text>
+      <text class="elab" x="446" y="248" text-anchor="start">every hour</text>
+    </svg>
+    <figcaption>The direction people expect is backwards. Discord initiates, and the Worker&rsquo;s reply <em>is</em> the HTTP response body. There is no bot process anywhere — the deployed Worker is the bot.</figcaption>
+  </figure>
+</section>
+
+<!-- 7 -->
+<section class="slide" id="s7">
+  <p class="kicker">Switch to Discord</p>
+  <h2>Live</h2>
+  <ol class="beats">
+    <li><span class="n">01</span><span><b>Paste an Amazon link.</b> Title, price and pack size come back off the listing.</span></li>
+    <li><span class="n">02</span><span><b>Paste a pair of headphones.</b> Refused — Electronics, not food.</span></li>
+    <li><span class="n">03</span><span><b>Vote.</b> Live count on the card; a duplicate add is a vote, not a second box.</span></li>
+    <li><span class="n">04</span><span><b><code>/snack list</code></b> — the budget line drawn through the middle.</span></li>
+    <li><span class="n">05</span><span><b>Drop the budget to $30.</b> Real items fall below the line, live.</span></li>
+    <li><span class="n">06</span><span><b><code>/snack simulate action:digest</code></b> — Monday, on demand.</span></li>
+    <li><span class="n">07</span><span><b><code>action:reminder</code></b> — the escalating nudge, without waiting a day.</span></li>
+    <li><span class="n">08</span><span><b>Mark as ordered</b>, then <b><code>/snack unavailable</code></b> — the receipt shows what actually arrived.</span></li>
+    <li><span class="n">09</span><span><b><code>action:rollover</code></b> — the losers land in next week with their votes.</span></li>
+    <li><span class="n">10</span><span><b><code>/snack rate</code></b> — and the score follows the snack into next week.</span></li>
+  </ol>
+</section>
+
+<!-- 8 -->
+<section class="slide" id="s8">
+  <p class="kicker">Why it can&rsquo;t just buy them</p>
+  <h2>No consumer retailer lets a bot buy anything</h2>
+  <ul class="doors">
+    <li><span class="what">Target ordering API</span><span class="verdict">does not exist</span></li>
+    <li><span class="what">Instacart public API</span><span class="verdict">partner-only, ~30–40 day key</span></li>
+    <li><span class="what">Amazon Product Advertising API</span><span class="verdict">closed to new customers</span></li>
+    <li><span class="what">Amazon multi-item cart URL</span><span class="verdict">302s into a sign-in gate</span></li>
+    <li><span class="what">Amazon &ldquo;Add to List&rdquo;</span><span class="verdict">session + CSRF, not replayable</span></li>
+    <li><span class="what">Headless browser checkout</span><span class="verdict">bot detection, and a stored card</span></li>
+  </ul>
+  <p class="pull">So a human clicks Place Order — and the bot never holds a payment credential.</p>
+  <p class="note">No stored cards, no PCI exposure, nothing to breach. The approval step stopped being a limitation and became the design — which is why this survived the cart URL dying mid-build.</p>
+</section>
+
+<!-- 9 -->
+<section class="slide" id="s9">
+  <p class="kicker">What reality did to the plan</p>
+  <h2>Five bugs, all found by pasting real links</h2>
+  <dl class="rows">
+    <div class="row">
+      <dt>A $500 RAM kit</dt>
+      <dd>passed the non-food filter. Amazon files computer parts under <code>pc</code> — a slug no blocklist would guess. It now reads the breadcrumb department too.</dd>
+    </div>
+    <div class="row">
+      <dt>A link without <code>https://</code></dt>
+      <dd>became a 700-character SQL <code>LIKE</code> pattern. SQLite <em>throws</em> on those rather than returning nothing.</dd>
+    </div>
+    <div class="row">
+      <dt>&ldquo;That failed&rdquo;</dt>
+      <dd>was the only diagnosis anyone got. Surfacing the real error is what found the bug above, one minute later.</dd>
+    </div>
+    <div class="row">
+      <dt>The buyer bypass</dt>
+      <dd>disabled the filter for the one person most likely to paste links. It&rsquo;s now a confirmation, not a bypass.</dd>
+    </div>
+  </dl>
+  <p class="note">Unit tests covered every one of these paths and caught none of them. Each needed real Amazon data or a real paste.</p>
+</section>
+
+<!-- 10 -->
+<section class="slide" id="s10">
+  <p class="kicker">Honestly</p>
+  <h2>What isn&rsquo;t built</h2>
+  <dl class="rows">
+    <div class="row">
+      <dt>A full week</dt>
+      <dd>The Monday cron has never fired. Rollover and the escalating reminders are covered by tests, not by a real week.</dd>
+    </div>
+    <div class="row">
+      <dt>Teams &amp; Slack</dt>
+      <dd>Scoped, not started. Slack is <em>2–4 days</em>; Teams 1–2 weeks. About 1,400 lines — the event log, the allocation, the scraping — don&rsquo;t know what Discord is.</dd>
+    </div>
+    <div class="row">
+      <dt>One-click ordering</dt>
+      <dd>Walmart&rsquo;s cart URL returns <em>blocked-as-a-bot</em> rather than gone, so a real browser may work. That&rsquo;s the one test a terminal can&rsquo;t run.</dd>
+    </div>
+    <div class="row">
+      <dt>DynamoDB</dt>
+      <dd>Still the long-term target. <code>(week, sk)</code> was chosen to mirror its partition-and-sort shape, so it&rsquo;s one new file behind the same interface.</dd>
+    </div>
+  </dl>
+</section>
+
+<!-- 11 -->
+<section class="slide" id="s11">
+  <p class="kicker">Thanks</p>
+  <p class="pull">The bot can&rsquo;t buy anything. That&rsquo;s why it&rsquo;s safe to put in a channel.</p>
+  <p class="lede">It decides <strong>what</strong> to buy, which is the part people actually argue about — and a person always places the order.</p>
+  <p class="note">Anything that touches a company card should go past InfoSec first. The human-in-the-loop design means no payment credentials live in the application, which is worth saying out loud rather than leaving them to ask.</p>
+</section>
+
+<div id="nav">
+  <span id="count"></span>
+  <button id="prev" type="button" aria-label="Previous slide">&lsaquo;</button>
+  <button id="next" type="button" aria-label="Next slide">&rsaquo;</button>
+</div>
+
+<script>
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var bar = document.getElementById('bar');
+  var count = document.getElementById('count');
+  var at = 0;
+
+  function show(n, push) {
+    at = Math.max(0, Math.min(slides.length - 1, n));
+    for (var i = 0; i < slides.length; i++) slides[i].hidden = i !== at;
+    bar.style.width = ((at + 1) / slides.length * 100) + '%';
+    count.textContent = (at + 1) + ' / ' + slides.length;
+    if (push) location.hash = '#' + (at + 1);
+    window.scrollTo(0, 0);
+  }
+
+  function fromHash() {
+    var n = parseInt((location.hash || '').replace('#', ''), 10);
+    return isNaN(n) ? 0 : n - 1;
+  }
+
+  document.getElementById('next').addEventListener('click', function () { show(at + 1, true); });
+  document.getElementById('prev').addEventListener('click', function () { show(at - 1, true); });
+  window.addEventListener('hashchange', function () { show(fromHash(), false); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case 'ArrowRight': case ' ': case 'PageDown': case 'j': show(at + 1, true); e.preventDefault(); break;
+      case 'ArrowLeft': case 'PageUp': case 'k': show(at - 1, true); e.preventDefault(); break;
+      case 'Home': show(0, true); e.preventDefault(); break;
+      case 'End': show(slides.length - 1, true); e.preventDefault(); break;
+      case 'f': if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); break;
+    }
+  });
+
+  // Keep the presenter's place across a republish mid-demo.
+  function start(state) {
+    show((state && typeof state.at === 'number') ? state.at : fromHash(), false);
+  }
+  if (window.claude && window.claude.hot) {
+    window.claude.hot.snapshot(function () { return { at: at }; });
+    window.claude.hot.ready ? window.claude.hot.ready(start) : start(window.claude.hot.data);
+  } else {
+    start(null);
+  }
+</script>

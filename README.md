@@ -99,6 +99,34 @@ a second place.
 `npm run deploy` from a laptop still works and goes to the same Worker, so
 nothing stops you deploying by hand mid-demo.
 
+## Running a demo
+
+The digest, the escalating reminders and the rollover only happen on a
+schedule, which makes them the three features nobody can see without waiting a
+week. Two things fix that.
+
+```sh
+npm run seed          # reset D1 to a known state (add --local for the dev database)
+```
+
+Seeding wipes the four weeks a demo can reach and writes: last week ordered
+with two verdicts, so `/snack rate` has something to rate and scores show on
+re-adds; six requests this week with uneven votes; the matching catalog rows so
+keyword search returns hits; and the budget pinned at $50, which puts the cut
+line after the third item. Weeks older than that are left alone.
+
+Seeded items have no Discord card, because none was ever posted — they show in
+`/snack list` and the digest but carry no vote button. Add one live to demo the
+card itself.
+
+Then, in Discord, `/snack simulate action:<digest|reminder|rollover>` fires the
+scheduled work on demand. It calls the same functions the cron handler calls and
+posts to the same channels, so the room sees the real thing and only the trigger
+is faked. Admin-only, since it posts publicly and appends to the log.
+
+`digest` marks the week digested, which is what `reminder` needs; `rollover` is
+separate from `digest` so the two can be narrated one at a time.
+
 ## Development
 
 ```sh

@@ -20,6 +20,7 @@ interface Option {
   type: number;
   required?: boolean;
   options?: Option[];
+  choices?: { name: string; value: string }[];
 }
 interface Command {
   name: string;
@@ -113,6 +114,24 @@ const body: Command[] = [
         type: SUBCOMMAND,
       },
       { name: 'digest', description: 'Run the weekly digest now', type: SUBCOMMAND },
+      {
+        name: 'simulate',
+        description: 'Admin: fire the Monday cron now, for demos',
+        type: SUBCOMMAND,
+        options: [
+          {
+            name: 'action',
+            description: 'Which scheduled job to run',
+            type: STRING,
+            required: true,
+            choices: [
+              { name: 'digest — post the Monday digest', value: 'digest' },
+              { name: 'reminder — send the next purchase nudge', value: 'reminder' },
+              { name: 'rollover — carry the losers into next week', value: 'rollover' },
+            ],
+          },
+        ],
+      },
     ],
   },
 ];
