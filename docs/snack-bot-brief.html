@@ -1,0 +1,410 @@
+<title>Snack Bot Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --paper: #eef1f4;
+    --card: #f8fafb;
+    --ink: #14181c;
+    --soft: #4e5763;
+    --faint: #78828e;
+    --rule: #c9d1d9;
+    --rule-soft: #dde3e9;
+    --accent: #0c6355;
+    --signal: #ab452a;
+
+    --display: "Bricolage Grotesque", "Helvetica Neue", sans-serif;
+    --body: "Newsreader", Georgia, serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #11151a;
+      --card: #171c22;
+      --ink: #e9edf1;
+      --soft: #a3aeba;
+      --faint: #7b8793;
+      --rule: #2c343d;
+      --rule-soft: #232a32;
+      --accent: #4ecfb2;
+      --signal: #e59470;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #11151a;
+    --card: #171c22;
+    --ink: #e9edf1;
+    --soft: #a3aeba;
+    --faint: #7b8793;
+    --rule: #2c343d;
+    --rule-soft: #232a32;
+    --accent: #4ecfb2;
+    --signal: #e59470;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 16px;
+    padding-block: clamp(2rem, 6vw, 4rem);
+  }
+
+  .wrap {
+    max-width: 58rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2rem, 5vw, 3.25rem);
+  }
+
+  .eyebrow {
+    font-family: var(--display);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 0.4rem 0 0;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.005em;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .standfirst {
+    font-size: 1.125rem;
+    color: var(--soft);
+    max-width: 44ch;
+    margin: 0.85rem 0 0;
+  }
+
+  /* ---- facts strip ---- */
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2.25rem;
+    margin: 1.75rem 0 0;
+    padding-top: 1.1rem;
+    border-top: 2px solid var(--ink);
+  }
+  .facts div { display: flex; flex-direction: column; }
+  .facts dt {
+    font-family: var(--display);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .facts dd {
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    margin: 0.1rem 0 0;
+  }
+
+  /* ---- stack table ---- */
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 34rem; }
+  th, td {
+    text-align: left;
+    padding: 0.6rem 1rem 0.6rem 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: baseline;
+  }
+  thead th {
+    font-family: var(--display);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    border-bottom: 1px solid var(--rule);
+  }
+  tbody th {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+  }
+  td { color: var(--soft); font-size: 0.9375rem; }
+  td.aws { font-family: var(--mono); font-size: 0.75rem; color: var(--faint); }
+
+  /* ---- figures ---- */
+  figure { margin: 0; }
+  svg { width: 100%; max-width: 100%; height: auto; display: block; }
+  figcaption {
+    font-size: 0.875rem;
+    color: var(--faint);
+    margin-top: 0.9rem;
+    max-width: 56ch;
+  }
+
+  .box { fill: var(--card); stroke: var(--rule); stroke-width: 1.5; }
+  .box-main { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+  .lab { font-family: var(--display); font-weight: 500; font-size: 13px; fill: var(--ink); }
+  .sub { font-family: var(--body); font-size: 10.5px; fill: var(--faint); }
+  .code { font-family: var(--mono); font-size: 10.5px; fill: var(--soft); }
+  .edge { stroke: var(--soft); stroke-width: 1.5; fill: none; }
+  .edge-hot { stroke: var(--accent); stroke-width: 2; fill: none; }
+  .edge-roll { stroke: var(--signal); stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+  .elab { font-family: var(--display); font-size: 10.5px; font-weight: 500; fill: var(--soft); }
+  .elab-hot { font-family: var(--display); font-size: 10.5px; font-weight: 700; fill: var(--accent); }
+  .elab-roll { font-family: var(--display); font-size: 10.5px; font-weight: 500; fill: var(--signal); }
+  .dot { fill: var(--ink); }
+  .dot-hot { fill: var(--signal); }
+  .when { font-family: var(--display); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; fill: var(--faint); }
+  .what { font-family: var(--display); font-size: 12.5px; font-weight: 500; fill: var(--ink); }
+  .what-hot { font-family: var(--display); font-size: 12.5px; font-weight: 700; fill: var(--signal); }
+
+  /* ---- commands ---- */
+  .cmds { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.25rem 2rem; }
+  .grp { display: flex; flex-direction: column; gap: 0.3rem; }
+  .grp h3 {
+    font-family: var(--display);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin: 0 0 0.15rem;
+  }
+  .grp p { margin: 0; font-size: 0.875rem; color: var(--soft); }
+  code {
+    font-family: var(--mono);
+    font-size: 0.78125rem;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--rule-soft);
+    border-radius: 3px;
+    padding: 0.05rem 0.3rem;
+  }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.1rem;
+    font-size: 0.875rem;
+    color: var(--faint);
+    max-width: 60ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Jewelers Mutual · Raleigh · Hackathon</p>
+    <h1>Snack Bot Brief</h1>
+    <p class="standfirst">The office asks for snacks in Discord. Votes decide, a budget cuts the list, and a person places the order.</p>
+
+    <dl class="facts">
+      <div><dt>Cost to run</dt><dd>$0</dd></div>
+      <div><dt>Runtime deps</dt><dd>1</dd></div>
+      <div><dt>Commands</dt><dd>11</dd></div>
+      <div><dt>Migrations</dt><dd>5</dd></div>
+      <div><dt>Tests</dt><dd>76</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2>Stack</h2>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Piece</th><th scope="col">Doing what</th><th scope="col">AWS equivalent</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Cloudflare Workers</th>
+            <td>The bot itself. Nothing idles.</td>
+            <td class="aws">Lambda + API Gateway</td>
+          </tr>
+          <tr>
+            <th scope="row">Cloudflare D1</th>
+            <td>SQLite. An append-only event log.</td>
+            <td class="aws">Aurora Serverless</td>
+          </tr>
+          <tr>
+            <th scope="row">Cron Triggers</th>
+            <td>One hourly firing; the schedule is code.</td>
+            <td class="aws">EventBridge Scheduler</td>
+          </tr>
+          <tr>
+            <th scope="row">Discord HTTP interactions</th>
+            <td>Discord calls in. No websocket held open.</td>
+            <td class="aws">inbound webhook</td>
+          </tr>
+          <tr>
+            <th scope="row">Ed25519 · WebCrypto</th>
+            <td>Verifies every request, fails closed.</td>
+            <td class="aws">—</td>
+          </tr>
+          <tr>
+            <th scope="row">TypeScript · node:test</th>
+            <td>Strict. No bot framework.</td>
+            <td class="aws">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>How a request moves</h2>
+    <figure>
+      <svg viewBox="0 0 860 330" role="img" aria-label="Discord posts a signed interaction to one Cloudflare Worker, which reads and appends to D1, fetches product pages from amazon.com, and replies to Discord. An hourly cron trigger invokes the same Worker.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--soft)"/>
+          </marker>
+          <marker id="arr-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+
+        <!-- Discord -->
+        <rect class="box" x="16" y="110" width="140" height="80" rx="3"/>
+        <text class="lab" x="86" y="145" text-anchor="middle">Discord</text>
+        <text class="sub" x="86" y="163" text-anchor="middle">one app, 11 commands</text>
+
+        <!-- Worker -->
+        <rect class="box-main" x="340" y="78" width="190" height="144" rx="3"/>
+        <text class="lab" x="435" y="135" text-anchor="middle">Cloudflare Worker</text>
+        <text class="code" x="435" y="155" text-anchor="middle">fetch() · scheduled()</text>
+        <text class="sub" x="435" y="173" text-anchor="middle">one script, two entry points</text>
+
+        <!-- D1 -->
+        <rect class="box" x="680" y="80" width="164" height="60" rx="3"/>
+        <text class="lab" x="762" y="105" text-anchor="middle">Cloudflare D1</text>
+        <text class="sub" x="762" y="123" text-anchor="middle">events · catalog · scores</text>
+
+        <!-- Amazon -->
+        <rect class="box" x="680" y="160" width="164" height="60" rx="3"/>
+        <text class="lab" x="762" y="185" text-anchor="middle">amazon.com</text>
+        <text class="sub" x="762" y="203" text-anchor="middle">title · price · department</text>
+
+        <!-- Cron -->
+        <rect class="box" x="340" y="262" width="190" height="52" rx="3"/>
+        <text class="lab" x="435" y="284" text-anchor="middle">Cron trigger</text>
+        <text class="code" x="435" y="301" text-anchor="middle">0 * * * *</text>
+
+        <!-- edges -->
+        <line class="edge-hot" x1="156" y1="134" x2="334" y2="134" marker-end="url(#arr-hot)"/>
+        <text class="elab-hot" x="245" y="126" text-anchor="middle">POST signed interaction</text>
+
+        <line class="edge" x1="334" y1="166" x2="162" y2="166" marker-end="url(#arr)"/>
+        <line class="edge" x1="530" y1="110" x2="674" y2="110" marker-end="url(#arr)"/>
+        <line class="edge" x1="530" y1="190" x2="674" y2="190" marker-end="url(#arr)"/>
+        <line class="edge" x1="435" y1="262" x2="435" y2="228" marker-end="url(#arr)"/>
+        <text class="elab" x="245" y="182" text-anchor="middle">reply · REST post</text>
+        <text class="elab" x="602" y="102" text-anchor="middle">read · append</text>
+        <text class="elab" x="602" y="182" text-anchor="middle">fetch on paste</text>
+        <text class="elab" x="446" y="248" text-anchor="start">every hour</text>
+      </svg>
+      <figcaption>Discord initiates — the Worker&rsquo;s reply <em>is</em> the HTTP response body. There is no bot process anywhere; the deployed Worker is the bot.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>How a week moves</h2>
+    <figure>
+      <svg viewBox="0 0 860 150" role="img" aria-label="A week runs from requests and votes, to Monday's budget cut line, to escalating reminders, to a person buying it, to private verdicts the following week. Items below the budget line roll into next week with their votes.">
+        <defs>
+          <marker id="arr-roll" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--signal)"/>
+          </marker>
+        </defs>
+
+        <line class="edge" x1="86" y1="56" x2="774" y2="56"/>
+
+        <circle class="dot" cx="86" cy="56" r="5"/>
+        <text class="when" x="86" y="34" text-anchor="middle">ALL WEEK</text>
+        <text class="what" x="86" y="80" text-anchor="middle">Requests &amp; votes</text>
+
+        <circle class="dot" cx="258" cy="56" r="5"/>
+        <text class="when" x="258" y="34" text-anchor="middle">MON 9:00</text>
+        <text class="what" x="258" y="80" text-anchor="middle">Budget cut line</text>
+
+        <circle class="dot" cx="430" cy="56" r="5"/>
+        <text class="when" x="430" y="34" text-anchor="middle">MON–WED</text>
+        <text class="what" x="430" y="80" text-anchor="middle">Reminders escalate</text>
+
+        <circle class="dot-hot" cx="602" cy="56" r="6"/>
+        <text class="when" x="602" y="34" text-anchor="middle">WHENEVER</text>
+        <text class="what-hot" x="602" y="80" text-anchor="middle">A person buys it</text>
+
+        <circle class="dot" cx="774" cy="56" r="5"/>
+        <text class="when" x="774" y="34" text-anchor="middle">NEXT WEEK</text>
+        <text class="what" x="774" y="80" text-anchor="middle">Verdicts, private</text>
+
+        <path class="edge-roll" d="M258,92 C258,124 172,124 92,100" marker-end="url(#arr-roll)"/>
+        <text class="elab-roll" x="180" y="140" text-anchor="middle">everything below the line rolls forward, votes intact</text>
+      </svg>
+      <figcaption>The bot never holds a payment credential. A human always places the order, which is the design rather than a limitation.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Commands</h2>
+    <div class="cmds">
+      <div class="grp">
+        <h3>Asking</h3>
+        <p><code>/snack add</code> an Amazon link, or a catalog keyword</p>
+        <p><code>/snack list</code> the week so far, with the budget line</p>
+        <p>Right-click a message &rarr; <strong>Add as snack</strong></p>
+      </div>
+      <div class="grp">
+        <h3>Deciding</h3>
+        <p><code>/snack digest</code> run the weekly cut now</p>
+        <p><code>/snack budget</code> show or change the cap</p>
+        <p><code>/snack flag</code> an allergen warning</p>
+      </div>
+      <div class="grp">
+        <h3>Buying</h3>
+        <p><strong>Mark as ordered</strong> on the digest</p>
+        <p><code>/snack unavailable</code> couldn&rsquo;t buy it</p>
+        <p><code>/snack substitute</code> bought something else</p>
+      </div>
+      <div class="grp">
+        <h3>Afterwards</h3>
+        <p><code>/snack rate</code> was it worth it — private</p>
+        <p><code>/snack repeat</code> clone last week&rsquo;s order</p>
+        <p><code>/snack help</code> all of the above, in Discord</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Non-food items are refused on Amazon&rsquo;s own department; the Official Snack Buyer can override deliberately. Anything touching a company card should go past InfoSec first.</p>
+  </footer>
+
+</div>

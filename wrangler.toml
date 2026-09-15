@@ -1,0 +1,42 @@
+name = "snack-bot"
+main = "src/worker.ts"
+compatibility_date = "2026-09-01"
+
+# One public URL, not one per version. Signature verification protects every
+# route anyway, but Discord only ever posts to the workers.dev address.
+preview_urls = false
+
+# Cron only understands UTC, and the office runs on Eastern time — 9am is
+# 13:00 UTC in summer (EDT) and 14:00 in winter (EST). Rather than editing this
+# twice a year, it fires hourly and the handler keeps the firing that is
+# actually 9am in New York.
+# Keep invocation logs, so a failure that happened an hour ago is still
+# readable instead of needing a live `wrangler tail` to catch it.
+[observability]
+enabled = true
+
+[triggers]
+# Hourly. The handler decides what to do: post the digest at 9am Monday local,
+# otherwise check whether an escalating purchase reminder is due. One trigger
+# keeps the whole schedule in code, where it can be tested.
+crons = ["0 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "snack-bot"
+database_id = "4b6c7075-59b1-4b6b-8808-b231e8ad3b14"
+migrations_dir = "migrations"
+
+[vars]
+DISCORD_APP_ID = "1547395919790612481"
+DIGEST_CHANNEL_ID = "1547391657845071904"
+BUDGET_CENTS = "5000"
+
+# Restricts Mark as ordered to this role — "Official Snack Buyer". Server
+# administrators bypass it, so an owner can't lock themselves out. Remove the
+# line and anyone in the channel can confirm. The reminder mentions the role.
+BUYER_ROLE_ID = "1547463773441499136"
+
+# Secrets, set with `wrangler secret put <NAME>` — never in this file:
+#   DISCORD_TOKEN
+#   DISCORD_PUBLIC_KEY
