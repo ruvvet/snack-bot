@@ -434,3 +434,43 @@ test('the price refresh only considers stale entries, oldest first, capped', asy
   assert.deepEqual(await staleAsins(db, [], cutoff, 10), []);
   assert.equal(calls.length, 0);
 });
+
+/** A D1 stand-in backed by a fixed products table. */
+function catalogDb(rows: { asin: string; title: string; price_cents: number }[]) {
+  const sorted = [...rows].sort((a, b) => a.title.localeCompare(b.title));
+  const stmt = {
+    bind: () => stmt,
+    run: async () => ({}),
+    async all<T>() {
+      return { results: sorted.map((r) => ({ ...r, pack_size: null, image_url: '' })) as T[] };
+    },
+    async first<T>() {
+      return { n: rows.length } as T;
+    },
+  };
+  return { prepare: () => stmt };
+}
+
+test('/snack catalog lists every product, alphabetically, with a count footer', async () => {
+  const { catalogCommand } = await import('../src/commands/catalog.ts');
+  const db = catalogDb([
+    { asin: 'B2', title: 'Pretzels', price_cents: 300 },
+    { asin: 'B1', title: 'Oreos', price_cents: 500 },
+  ]);
+
+  const reply = await catalogCommand(db as never)(inv());
+  assert.equal(reply.kind, 'update');
+  const embed = 'embeds' in reply ? reply.embeds[0]! : undefined;
+  assert.ok(embed);
+  // Oreos sorts before Pretzels even though it was seeded second.
+  assert.ok(embed.description!.indexOf('Oreos') < embed.description!.indexOf('Pretzels'));
+  assert.match(embed.footer!.text, /2 snacks known/);
+});
+
+test('/snack catalog says so when nothing has been added yet', async () => {
+  const { catalogCommand } = await import('../src/commands/catalog.ts');
+  const reply = await catalogCommand(catalogDb([]) as never)(inv());
+  assert.equal(reply.kind, 'update');
+  const embed = 'embeds' in reply ? reply.embeds[0]! : undefined;
+  assert.match(embed!.description!, /Nothing in the catalog yet/);
+});
